@@ -1,0 +1,44 @@
+{
+  "houseRules": [
+    {
+      "id": "double_points",
+      "title": "DOUBLE POINTS",
+      "description": "Winner gets 2 points this round."
+    },
+    {
+      "id": "submit_two",
+      "title": "DOUBLE TROUBLE",
+      "description": "Everyone submits 2 answer cards this round."
+    },
+    {
+      "id": "worst_answer",
+      "title": "WORST ANSWER WINS",
+      "description": "Judge must pick the worst answer."
+    },
+    {
+      "id": "speed_round",
+      "title": "SPEED ROUND",
+      "description": "Players only have 30 seconds to submit."
+    },
+    {
+      "id": "winner_judge",
+      "title": "WINNER RUNS THE HOUSE",
+      "description": "Round winner becomes the next judge."
+    },
+    {
+      "id": "silent_round",
+      "title": "SILENT ROUND",
+      "description": "No reading cards out loud this round."
+    },
+    {
+      "id": "steal_point",
+      "title": "STEAL A POINT",
+      "description": "Winner steals 1 point from another player."
+    },
+    {
+      "id": "reverse_winner",
+      "title": "REVERSE WINNER",
+      "description": "Least funny answer wins this round."
+    }
+  ]
+}
