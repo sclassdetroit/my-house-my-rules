@@ -109,6 +109,10 @@ export default function App() {
     setPendingPacks(null);
   }
 
+  function importCustomPack(packText) {
+    call("importCustomPack", { packText });
+  }
+
   function pickCard(cardId) {
     if (isJudge || room.phase !== "playing" || hasSubmitted) return;
     setSelectedCards((current) => {
@@ -164,6 +168,7 @@ export default function App() {
           isHost={isHost}
           selectedPacks={selectedPacks}
           onTogglePack={togglePack}
+          onImportPack={importCustomPack}
           onStart={() => call("startGame")}
           onHouseRule={() => call("activateHouseRule")}
         />

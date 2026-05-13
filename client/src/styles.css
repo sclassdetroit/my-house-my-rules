@@ -62,6 +62,20 @@ input {
   outline: none;
 }
 
+textarea {
+  width: 100%;
+  min-height: 190px;
+  resize: vertical;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(5, 5, 8, 0.82);
+  color: #fff;
+  padding: 0.85rem;
+  font: inherit;
+  font-size: 0.9rem;
+  outline: none;
+}
+
 .screen,
 .game-shell {
   width: min(1120px, 100%);
@@ -244,10 +258,40 @@ small {
   font-weight: 900;
 }
 
+.toggle span {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.toggle em {
+  color: #aaaab6;
+  font-size: 0.75rem;
+  font-style: normal;
+}
+
+.premium-toggle {
+  box-shadow: 0 0 24px rgba(255, 29, 94, 0.18);
+}
+
 .toggle input {
   width: 1.25rem;
   min-height: 1.25rem;
   accent-color: #ff1d5e;
+}
+
+.importer {
+  display: grid;
+  gap: 0.65rem;
+  border-radius: 14px;
+  padding: 0.75rem;
+  background: rgba(255, 29, 94, 0.1);
+  border: 1px solid rgba(255, 29, 94, 0.24);
+}
+
+.importer p {
+  margin: 0;
+  color: #cfcfd8;
+  font-size: 0.84rem;
 }
 
 .game-shell {
@@ -363,6 +407,7 @@ small {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 1;
 }
 
 .card img.missing {
@@ -379,6 +424,7 @@ small {
   color: #111;
   font-weight: 1000;
   text-transform: uppercase;
+  z-index: 0;
 }
 
 .card-prompt .card-fallback,
@@ -389,7 +435,7 @@ small {
 
 .card-text {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 82%;

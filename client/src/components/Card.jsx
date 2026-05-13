@@ -7,10 +7,10 @@ const fallbackLabels = {
 export default function Card({ type = "answer", text, selected = false, hidden = false, onClick, children }) {
   const kind = hidden ? "hidden" : type;
   const src = hidden
-    ? "/assets/cards/black-logo-card.png"
+    ? "/assets/cards/black-logo-card.jpg"
     : type === "prompt"
-      ? "/assets/cards/blank-black-card.png"
-      : "/assets/cards/blank-white-card.png";
+      ? "/assets/cards/blank-black-card.jpg"
+      : "/assets/cards/blank-white-card.jpg";
 
   return (
     <button

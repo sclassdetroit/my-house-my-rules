@@ -4,10 +4,12 @@ import cors from "cors";
 import { Server } from "socket.io";
 import {
   PACKS,
+  addCustomPack,
   activateHouseRule,
   advanceAfterResult,
   createRoom,
   handleDisconnect,
+  getPackMap,
   makePlayer,
   makeRoomCode,
   pickWinner,
@@ -122,10 +124,21 @@ io.on("connection", (socket) => {
   socket.on("selectPacks", ({ packs }, callback) => {
     withRoom(socket, callback, (room, player) => {
       requireHost(room, player);
-      const valid = Array.isArray(packs) ? packs.filter((pack) => PACKS[pack]) : ["main"];
+      const availablePacks = getPackMap(room);
+      const valid = Array.isArray(packs) ? packs.filter((pack) => availablePacks[pack]) : ["main"];
       room.selectedPacks = valid.length ? Array.from(new Set(valid)) : ["main"];
       emitRoom(room);
       callback?.({ ok: true });
+    });
+  });
+
+  socket.on("importCustomPack", ({ packText, pack }, callback) => {
+    withRoom(socket, callback, (room, player) => {
+      requireHost(room, player);
+      if (room.phase !== "lobby") throw new Error("Import custom packs before starting the game.");
+      const savedPack = addCustomPack(room, pack || packText);
+      emitRoom(room);
+      callback?.({ ok: true, pack: savedPack });
     });
   });
 

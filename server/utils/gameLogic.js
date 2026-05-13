@@ -8,7 +8,8 @@ const cardsDir = path.join(__dirname, "..", "cards");
 export const PACKS = {
   main: readJson("main.json"),
   afterdark: readJson("afterdark.json"),
-  couples: readJson("couples.json")
+  couples: readJson("couples.json"),
+  filthysecrets: readJson("filthysecrets.json")
 };
 
 export const HOUSE_RULES = readJson("houserules.json").houseRules;
@@ -44,6 +45,7 @@ export function createRoom({ roomCode, host }) {
     hostId: host.id,
     players: [host],
     selectedPacks: ["main"],
+    customPacks: [],
     blackDeck: [],
     whiteDeck: [],
     discardPile: [],
@@ -67,6 +69,7 @@ export function publicRoom(room, viewerId = null) {
     blackDeck: undefined,
     whiteDeck: undefined,
     discardPile: undefined,
+    availablePacks: getAvailablePacks(room),
     players: room.players.map((player) => ({
       ...player,
       hand: player.id === viewerId ? player.hand : []
@@ -101,11 +104,57 @@ export function startGame(room) {
 
 export function buildDecks(room) {
   const packs = room.selectedPacks.length ? room.selectedPacks : ["main"];
-  const blackCards = packs.flatMap((pack) => PACKS[pack]?.blackCards || []);
-  const whiteCards = packs.flatMap((pack) => PACKS[pack]?.whiteCards || []);
+  const availablePacks = getPackMap(room);
+  const blackCards = packs.flatMap((pack) => availablePacks[pack]?.blackCards || []);
+  const whiteCards = packs.flatMap((pack) => availablePacks[pack]?.whiteCards || []);
+  console.log("[packs] selected", packs.join(", "));
+  console.log("[packs] card counts", { blackCards: blackCards.length, whiteCards: whiteCards.length });
+  if (!blackCards.length || !whiteCards.length) {
+    throw new Error("Selected packs need at least 1 black card and 1 white card. Add cards to the pack file or select another pack.");
+  }
   room.blackDeck = shuffle(blackCards.map((text, index) => ({ id: `b-${index}-${hash(text)}`, text })));
   room.whiteDeck = shuffle(whiteCards.map((text, index) => ({ id: `w-${index}-${hash(text)}`, text })));
   room.discardPile = [];
+  console.log("[packs] shuffle complete", { blackDeck: room.blackDeck.length, whiteDeck: room.whiteDeck.length });
+}
+
+export function getPackMap(room) {
+  return {
+    ...PACKS,
+    ...Object.fromEntries((room.customPacks || []).map((pack) => [pack.id, pack]))
+  };
+}
+
+export function getAvailablePacks(room) {
+  return Object.entries(getPackMap(room)).map(([id, pack]) => ({
+    id,
+    name: pack.name,
+    warning: pack.warning || null,
+    premium: Boolean(pack.premium),
+    custom: Boolean(pack.custom),
+    blackCards: pack.blackCards.length,
+    whiteCards: pack.whiteCards.length
+  }));
+}
+
+export function addCustomPack(room, input) {
+  const pack = normalizeCustomPack(input);
+  const id = `custom-${hash(pack.name)}-${Date.now().toString(36)}`;
+  const savedPack = {
+    ...pack,
+    id,
+    custom: true,
+    premium: true
+  };
+  room.customPacks.push(savedPack);
+  room.selectedPacks = Array.from(new Set([...room.selectedPacks, id]));
+  console.log("[packs] custom pack loaded", {
+    id,
+    name: savedPack.name,
+    blackCards: savedPack.blackCards.length,
+    whiteCards: savedPack.whiteCards.length
+  });
+  return savedPack;
 }
 
 export function activateHouseRule(room) {
@@ -264,6 +313,50 @@ function draw(room, count) {
     room.discardPile = [];
   }
   return room.whiteDeck.splice(0, count);
+}
+
+function normalizeCustomPack(input) {
+  const pack = typeof input === "string" ? parsePackText(input) : input;
+  const name = String(pack?.name || "Custom Pack").trim().slice(0, 60) || "Custom Pack";
+  const warning = String(pack?.warning || "18+ ADULT CONTENT").trim().slice(0, 120);
+  const blackCards = cleanCards(pack?.blackCards);
+  const whiteCards = cleanCards(pack?.whiteCards);
+
+  if (!blackCards.length) throw new Error("Custom pack needs at least 1 black card.");
+  if (!whiteCards.length) throw new Error("Custom pack needs at least 1 white card.");
+
+  return { name, warning, blackCards, whiteCards };
+}
+
+function parsePackText(text) {
+  const source = String(text || "").replace(/\r\n/g, "\n");
+  try {
+    return JSON.parse(source);
+  } catch {
+    const blackMatch = source.match(/BLACK CARDS:\s*([\s\S]*?)(?:WHITE CARDS:|$)/i);
+    const whiteMatch = source.match(/WHITE CARDS:\s*([\s\S]*)/i);
+    return {
+      name: source.match(/PACK NAME:\s*(.+)/i)?.[1]?.trim() || "Custom Pack",
+      warning: source.match(/WARNING:\s*(.+)/i)?.[1]?.trim() || "18+ ADULT CONTENT",
+      blackCards: splitLines(blackMatch?.[1] || ""),
+      whiteCards: splitLines(whiteMatch?.[1] || "")
+    };
+  }
+}
+
+function cleanCards(cards) {
+  if (!Array.isArray(cards)) return [];
+  return cards
+    .map((card) => String(card || "").trim())
+    .filter(Boolean)
+    .slice(0, 500);
+}
+
+function splitLines(value) {
+  return String(value || "")
+    .split("\n")
+    .map((line) => line.replace(/^[-*•\d.)\s]+/, "").trim())
+    .filter(Boolean);
 }
 
 function nextConnectedJudgeIndex(room) {
