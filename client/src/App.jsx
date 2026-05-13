@@ -24,6 +24,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [showWarning, setShowWarning] = useState(false);
   const [pendingPacks, setPendingPacks] = useState(null);
+  const [pendingWarningPack, setPendingWarningPack] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(30);
 
   const me = room?.players.find((player) => player.id === playerId);
@@ -95,8 +96,12 @@ export default function App() {
       ? selectedPacks.filter((item) => item !== pack)
       : [...selectedPacks, pack];
     const finalPacks = next.length ? next : ["main"];
-    if (pack === "afterdark" && finalPacks.includes("afterdark") && !selectedPacks.includes("afterdark")) {
+    const packInfo = room?.availablePacks?.find((item) => item.id === pack);
+    const warningPack = getWarningPack(pack, packInfo);
+    const acceptedWarnings = JSON.parse(localStorage.getItem("mhhrAcceptedWarnings") || "{}");
+    if (warningPack && finalPacks.includes(pack) && !selectedPacks.includes(pack) && !acceptedWarnings[warningPack.id]) {
       setPendingPacks(finalPacks);
+      setPendingWarningPack(warningPack);
       setShowWarning(true);
       return;
     }
@@ -104,9 +109,37 @@ export default function App() {
   }
 
   function acceptAfterDark() {
+    if (pendingWarningPack?.id) {
+      const acceptedWarnings = JSON.parse(localStorage.getItem("mhhrAcceptedWarnings") || "{}");
+      localStorage.setItem("mhhrAcceptedWarnings", JSON.stringify({
+        ...acceptedWarnings,
+        [pendingWarningPack.id]: true
+      }));
+    }
     setShowWarning(false);
     call("selectPacks", { packs: pendingPacks || selectedPacks });
+    setPendingWarningPack(null);
     setPendingPacks(null);
+  }
+
+  function getWarningPack(packId, packInfo) {
+    if (packId === "afterdark") {
+      return {
+        id: "afterdark",
+        title: "AFTER DARK IS 18+",
+        message: "This pack is made for adults. Confirm everyone playing is 18 or older.",
+        confirmLabel: "CONFIRM 18+"
+      };
+    }
+    if (packInfo?.warning || packInfo?.premium) {
+      return {
+        id: packInfo.id,
+        title: `${packInfo.name.toUpperCase()} IS 18+`,
+        message: packInfo.warning || "This premium pack is intended for mature audiences only.",
+        confirmLabel: packInfo.id === "filthysecrets" ? "ENTER THE CHAOS" : "CONFIRM 18+"
+      };
+    }
+    return null;
   }
 
   function importCustomPack(packText) {
@@ -150,6 +183,7 @@ export default function App() {
     return (
       <main className="screen landing">
         <section className="brand-lockup">
+          <img className="brand-logo" src="/assets/brand/company-logo.png" alt="Game company logo" onError={(event) => event.currentTarget.remove()} />
           <p className="eyebrow">Adult party card game</p>
           <h1>My House My Rules</h1>
           <p>Play with friends in the same room or across tabs. Original cards, anonymous chaos, house rules.</p>
@@ -182,9 +216,19 @@ export default function App() {
           onImportPack={importCustomPack}
           onStart={() => call("startGame")}
           onHouseRule={() => call("activateHouseRule")}
-          onLeave={leaveGame}
         />
-        <WarningModal open={showWarning} onAccept={acceptAfterDark} onCancel={() => setShowWarning(false)} />
+        <WarningModal
+          open={showWarning}
+          title={pendingWarningPack?.title}
+          message={pendingWarningPack?.message}
+          confirmLabel={pendingWarningPack?.confirmLabel}
+          onAccept={acceptAfterDark}
+          onCancel={() => {
+            setShowWarning(false);
+            setPendingWarningPack(null);
+            setPendingPacks(null);
+          }}
+        />
         {error && <div className="toast">{error}</div>}
       </>
     );
@@ -194,6 +238,7 @@ export default function App() {
     <main className="game-shell">
       <header className="game-top">
         <div className="top-actions">
+          <img className="brand-logo mini" src="/assets/brand/company-logo.png" alt="Game company logo" onError={(event) => event.currentTarget.remove()} />
           <RoomCode code={room.roomCode} />
           <button className="exit-button" type="button" onClick={leaveGame}>Exit Game</button>
         </div>

@@ -8,8 +8,7 @@ export default function Lobby({
   onTogglePack,
   onImportPack,
   onStart,
-  onHouseRule,
-  onLeave
+  onHouseRule
 }) {
   const [packText, setPackText] = useState("");
   const [showImporter, setShowImporter] = useState(false);
@@ -28,8 +27,8 @@ export default function Lobby({
   return (
     <main className="screen lobby-screen">
       <RoomCode code={room.roomCode} />
-      <button className="exit-button lobby-exit" type="button" onClick={onLeave}>Exit Lobby</button>
       <section className="panel">
+        <img className="brand-logo small" src="/assets/brand/company-logo.png" alt="Game company logo" onError={(event) => event.currentTarget.remove()} />
         <p className="eyebrow">Lobby</p>
         <h1>My House My Rules</h1>
         <div className="player-list">
@@ -55,6 +54,7 @@ export default function Lobby({
                 <span>
                   {pack.name}
                   {pack.custom && <small> IMPORTED</small>}
+                  {(pack.warning || pack.premium) && <small> 18+</small>}
                   <em>{pack.blackCards} black / {pack.whiteCards} white</em>
                 </span>
               </label>

@@ -98,6 +98,26 @@ textarea {
   text-transform: uppercase;
 }
 
+.brand-logo {
+  display: block;
+  width: min(220px, 70vw);
+  max-height: 96px;
+  object-fit: contain;
+  margin-bottom: 0.85rem;
+  filter: drop-shadow(0 0 24px rgba(255, 29, 94, 0.32));
+}
+
+.brand-logo.small {
+  width: min(150px, 50vw);
+  max-height: 64px;
+}
+
+.brand-logo.mini {
+  width: 42px;
+  height: 42px;
+  margin: 0;
+}
+
 .brand-lockup p {
   max-width: 42rem;
   color: #d7d7df;
@@ -271,6 +291,7 @@ small {
 
 .premium-toggle {
   box-shadow: 0 0 24px rgba(255, 29, 94, 0.18);
+  border: 1px solid rgba(255, 29, 94, 0.26);
 }
 
 .toggle input {
@@ -318,10 +339,6 @@ small {
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: none;
   font-size: 0.78rem;
-}
-
-.lobby-exit {
-  width: fit-content;
 }
 
 .scoreboard {
