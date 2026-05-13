@@ -28,7 +28,6 @@ export default function Lobby({
     <main className="screen lobby-screen">
       <RoomCode code={room.roomCode} />
       <section className="panel">
-        <img className="brand-logo small" src="/assets/brand/company-logo.png" alt="Game company logo" onError={(event) => event.currentTarget.remove()} />
         <p className="eyebrow">Lobby</p>
         <h1>My House My Rules</h1>
         <div className="player-list">

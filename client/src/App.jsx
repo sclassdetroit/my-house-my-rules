@@ -183,7 +183,6 @@ export default function App() {
     return (
       <main className="screen landing">
         <section className="brand-lockup">
-          <img className="brand-logo" src="/assets/brand/company-logo.png" alt="Game company logo" onError={(event) => event.currentTarget.remove()} />
           <p className="eyebrow">Adult party card game</p>
           <h1>My House My Rules</h1>
           <p>Play with friends in the same room or across tabs. Original cards, anonymous chaos, house rules.</p>
@@ -238,7 +237,6 @@ export default function App() {
     <main className="game-shell">
       <header className="game-top">
         <div className="top-actions">
-          <img className="brand-logo mini" src="/assets/brand/company-logo.png" alt="Game company logo" onError={(event) => event.currentTarget.remove()} />
           <RoomCode code={room.roomCode} />
           <button className="exit-button" type="button" onClick={leaveGame}>Exit Game</button>
         </div>
