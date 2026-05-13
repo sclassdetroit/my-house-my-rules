@@ -194,6 +194,18 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("leaveRoom", (_payload, callback) => {
+    withRoom(socket, callback, (room) => {
+      const roomCode = room.roomCode;
+      handleDisconnect(room, socket.id);
+      socket.leave(roomCode);
+      socket.data.roomCode = null;
+      socket.data.playerId = null;
+      emitRoom(room);
+      callback?.({ ok: true });
+    });
+  });
+
   socket.on("disconnect", () => {
     const room = rooms.get(socket.data.roomCode);
     if (!room) return;

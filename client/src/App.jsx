@@ -135,6 +135,17 @@ export default function App() {
     window.location.reload();
   }
 
+  function leaveGame() {
+    socket.emit("leaveRoom", {}, () => {
+      localStorage.removeItem("mhhrPlayerId");
+      localStorage.removeItem("mhhrRoomCode");
+      setPlayerId(null);
+      setRoom(null);
+      setSelectedCards([]);
+      setError("");
+    });
+  }
+
   if (!room) {
     return (
       <main className="screen landing">
@@ -171,6 +182,7 @@ export default function App() {
           onImportPack={importCustomPack}
           onStart={() => call("startGame")}
           onHouseRule={() => call("activateHouseRule")}
+          onLeave={leaveGame}
         />
         <WarningModal open={showWarning} onAccept={acceptAfterDark} onCancel={() => setShowWarning(false)} />
         {error && <div className="toast">{error}</div>}
@@ -181,7 +193,10 @@ export default function App() {
   return (
     <main className="game-shell">
       <header className="game-top">
-        <RoomCode code={room.roomCode} />
+        <div className="top-actions">
+          <RoomCode code={room.roomCode} />
+          <button className="exit-button" type="button" onClick={leaveGame}>Exit Game</button>
+        </div>
         <Scoreboard players={room.players} judgeId={judgeId} />
       </header>
 

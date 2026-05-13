@@ -8,7 +8,8 @@ export default function Lobby({
   onTogglePack,
   onImportPack,
   onStart,
-  onHouseRule
+  onHouseRule,
+  onLeave
 }) {
   const [packText, setPackText] = useState("");
   const [showImporter, setShowImporter] = useState(false);
@@ -27,6 +28,7 @@ export default function Lobby({
   return (
     <main className="screen lobby-screen">
       <RoomCode code={room.roomCode} />
+      <button className="exit-button lobby-exit" type="button" onClick={onLeave}>Exit Lobby</button>
       <section className="panel">
         <p className="eyebrow">Lobby</p>
         <h1>My House My Rules</h1>
