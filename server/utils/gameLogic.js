@@ -6,10 +6,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const cardsDir = path.join(__dirname, "..", "cards");
 
 export const PACKS = {
+
   main: readJson("main.json"),
-  afterdark: readJson("afterdark.json"),
-  couples: readJson("couples.json"),
-  filthysecrets: readJson("filthysecrets.json")
+afterdark: readJson("afterdark.json"),
+couples: readJson("couples.json"),
+filthysecrets: readJson("filthysecrets.json"),
+groupchatleaked: readJson("groupchatleaked.json")
 };
 
 export const HOUSE_RULES = readJson("houserules.json").houseRules;
